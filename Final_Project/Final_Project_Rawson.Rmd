@@ -1,24 +1,16 @@
 ---
 title: "Final Project"
+author: Clayton Rawson
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-  # Clayton Rawson
-  
-  # BIOL 3100-001
-  
-  # 12/17/2021
-  
-  # Introduction:
+## [Home](https://crawson1987.github.io) | [About Me](https://crawson1987.github.io/About_Me) | [CV](https::/crawson1987.github.io/CV) | [Final Project](https://crawson1987.github.io/Final_Project/)
 
-  # Methods:
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+``` 
   
-  # Data Analysis:
-  
-```{r give a name,  echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r loading programs and equations, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 library(tidyverse)
 library(phyloseq)
 library(readxl)
@@ -41,54 +33,71 @@ plot_bar2 <- function (physeq, x = "Sample", y = "Abundance", fill = NULL,
   return(p)
 }
 ```
-
-# load phyloseq object
-```{r echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
+```{r A, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 ps <- readRDS("Clayton_SRA-main/output/ps_object_not_cleaned.RDS")
-# load metadata
-meta <- read_xlsx("Final_Project/PRJNA664779.xlsx")
 
-# Exolore ps object
+meta <- read_xlsx("PRJNA664779.xlsx") 
+
 sample.names(ps)
 rank_names(ps)
 ```
+# A Quatitative and Statistical Analysis of a Previous Published Paper on Parkinson's Disease and the Gut Mycobiome 
+  
+## Introduction
+  
+The goal of this research was to analyze the metadata from a recently published paper by using various statistical methods as well as charts and plots. The goal was to get an more complete view of the data and the interpretations that could be made from it. The research paper that I will be using is titled "The Gut Mycobiome in Parkinson's Disease." The paper was published in February of 2021 in the Journal of Parkinson's Disease (vol. 11, no.1, pp. 152-158) by Mihai S. Cirstea, Kristen Sundvick, Ella Golz, Adam C. Yu, Rozlyn C. T. Boutin, Daniel Kliger, Brett B. Finlay, and Silke Appel-Cresswell. 
+
+## Data Analysis
+
+The first step in my analysis look at the data and see what the data looked like. The following chart looked at the number of samples per OTU. 
+```{r B, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 otu_table(ps) %>% rowSums() %>% plot()
+```
+
+From the chart above we can see that a lot of the samples are clustered at the bottom with not a lot taxonomic units with a high number of samples. There are a few that have much higher numbers, above 10000, but most of them are low with values much less than 5000.
+
+Despite not being encouraged by the number of samples I continued on and decided to look at the data from some different angles to see how diverse the data was. Maybe it was more diverse then I thought it was despite the low numbers of samples. I started this by looking at the numbers of samples in each of the three groups: control, PD (disease state), and NA group that has samples that fell into no categories. I also decided to look at the data in terms phylum level diversity. 
+
+```{r C, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 sam_data(ps)$disease_status
 tax_table(ps)[,1] %>% table()
 
-# Remove non-fungi
 fung <- subset_taxa(ps, Kingdom  == "k__Fungi")
 tax_table(fung)[,1] %>% table()
 
-### Remove empty ASVs 
 colSums(otu_table(fung)) %>% summary()
 
 rowSums(otu_table(fung)) %>% summary()
 
-# tells us how many DNA molecules where detected that where fungi
 data.frame(SamplingEffort = rowSums(otu_table(fung)),
            Disease_Status = fung@sam_data$disease_status) %>% 
   ggplot(aes(x=factor(Disease_Status), y = SamplingEffort)) +
   geom_boxplot() + geom_jitter()
 
-# removed NA values from disease status
 fung <- subset_samples(fung, !is.na(disease_status))
 
-# transform to relative abundance
 fung_ra <- transform_sample_counts(fung, function(x){x/sum(x)})
-
-# bar plot of phyla
+```
+```{r E, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 plot_bar(fung_ra,fill = "Phylum")
-
-# bar plot for Phylum
+```
+```{r F, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 fung %>% 
   merge_samples("disease_status") %>% 
   transform_sample_counts(function(x){x/sum(x)}) %>% 
   plot_bar2(fill = "Phylum") + 
   theme_minimal() + 
   labs(y = "Relative Abundance")
+``` 
 
-# bar plot for Class
+The graph and chart above both helped me learn more about the metadata that the paper was working with. In terms of the chart, I found what I was expecting. The data is not very diverse in both the control and the PD groups.
+The phylum level data looked reasonable. A saw the basic phyla that I was expecting to see. All of the main fungal phyla were present in numbers that I could see as reasonable. 
+
+### Class Level Data
+
+I decided that I wanted to next see the class level data and see how it compared to the diveristy I was seeing in the phylum level. 
+
+```{r G, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 fung %>% 
   merge_samples("disease_status") %>% 
   transform_sample_counts(function(x){x/sum(x)}) %>% 
@@ -96,13 +105,27 @@ fung %>%
   theme_minimal() + 
   labs(y = "Relative Abundance") +
   scale_fill_viridis_d()
+```
 
-# alpha diversity 
+text place holder (not finished)
+
+### Alpha Diversity
+
+text place holder (not finished)
+
+```{r H, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 fung %>% 
   phyloseq::plot_richness(x="disease_status", measures = c("Observed","Shannon")) +
   geom_boxplot()
-  
-# beta diversity
+```
+
+text place holder (not finished) 
+
+### Beta Diversity
+
+text place holder (not finished)
+
+```{r I, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 DCA <- fung %>% 
   transform_sample_counts(function(x){x/sum(x)}) %>% 
   ordinate(method = "PCoA")
@@ -111,15 +134,15 @@ plot_ordination(fung %>% transform_sample_counts(function(x){x/sum(x)}),
                 DCA,
                 color="disease_status") +
 theme_minimal()
+```
 
-# see what columns are in the data set
-ps@sam_data$  
+text place holder (not finished)
 
+### Categorical Comparison of BMI, sex, and disease status
 
-  DCA <- fung %>% 
-  transform_sample_counts(function(x){x/sum(x)}) %>% 
-  ordinate(method = "PCoA")
+text place holder (not finished)
 
+```{r J, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 plotord2 <- function(i){
   p <- plot_ordination(fung %>% transform_sample_counts(function(x){x/sum(x)}), 
                        DCA,
@@ -129,27 +152,37 @@ plotord2 <- function(i){
   
 }
 
+```{r K, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 p1 <- plotord2("BMI")
 p2 <- plotord2("sex")
 p3 <- plotord2("disease_status")
 
 p1 + p2 + p3
+```
 
-# add new column for disease (binary_
+```{r L, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 fung@sam_data$disease_status[fung@sam_data$disease_status == "PD"] <- 1
 fung@sam_data$disease_status[fung@sam_data$disease_status == "Control"] <- 0
 fung@sam_data$disease_status <- as.numeric(fung@sam_data$disease_statu)
+```
 
+### Shannon Diversity
 
+text place holder (not finished)
+
+```{r M, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 test <- estimate_richness(fung, measures = "Shannon")
 test$Shannon
 fung@sam_data$Shannon <- test$Shannon
 
-# model disease as presence as function of Shannon diversity
 mod <- glm(data=fung@sam_data %>% as("data.frame"),
            formula = disease_status ~ Shannon,
            family =  "binomial") 
+```
 
+text place holder (not finished)
+
+```{r N, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 add_predictions(data=fung@sam_data %>% as("data.frame"),
                 model = mod, 
                 type = "response") %>% 
@@ -157,8 +190,9 @@ add_predictions(data=fung@sam_data %>% as("data.frame"),
   geom_point()
 summary(mod)
 ```
-
-  # Discussion: 
   
-  # Conclusions: 
+text place holder (not finished)
   
+# Conclusions 
+  
+text place holder (not finished)

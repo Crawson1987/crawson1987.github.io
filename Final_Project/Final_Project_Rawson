@@ -3,7 +3,7 @@ library(phyloseq)
 library(readxl)
 library(patchwork)
 library(modelr)
-
+ 
 plot_bar2 <- function (physeq, x = "Sample", y = "Abundance", fill = NULL,
                        title = NULL, facet_grid = NULL)
 {
@@ -24,7 +24,9 @@ plot_bar2 <- function (physeq, x = "Sample", y = "Abundance", fill = NULL,
 ps <- readRDS("Final_Project/Clayton_SRA-main/output/ps_object_not_cleaned.RDS")
 
 # load metadata
-meta <- read_xlsx("Final_Project/PRJNA664779.xlsx")
+meta <- read_xlsx("crawson.1987.github.io/Final_Project/PRJNA664779.xlsx")
+
+
 
 # Exolore ps object
 sample.names(ps)
