@@ -95,7 +95,7 @@ The phylum level data looked reasonable. A saw the basic phyla that I was expect
 
 ### Class Level Data
 
-I decided that I wanted to next see the class level data and see how it compared to the diveristy I was seeing in the phylum level. 
+I decided that I wanted to next see the class level data and see how it compared to the diversity I was seeing in the phylum level. 
 
 ```{r G, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 fung %>% 
@@ -107,11 +107,11 @@ fung %>%
   scale_fill_viridis_d()
 ```
 
-text place holder (not finished)
+The diversity at the class level was also similar to what I was expecting. I saw a good number of class many of which I had not heard of. The classes looked evenly spread out with a good number of abundance per class. I figured that at this point I was not going to find the information I needed from looking at classes alone. To this end I decided to look at some other types of diversity to see what that could tell me. 
 
 ### Alpha Diversity
 
-text place holder (not finished)
+I decided to start with alpha diversity, which is the mean diversity of a species in a single sample. Hopefully, by by looking at this kind of diversity I can see how diverse each of the samples are. 
 
 ```{r H, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 fung %>% 
@@ -119,11 +119,11 @@ fung %>%
   geom_boxplot()
 ```
 
-text place holder (not finished) 
+The alpha diversity seen above showed that a lot of the samples are clustered near each other with some diversity being found near the 50, 100, 150, and 200 mark. The data and graph above show that the diversity of the samples is not that high. Since Shannon Diversity is a type of alpha diversity I put it hear, but I will discuss it more later. 
 
 ### Beta Diversity
 
-text place holder (not finished)
+After looking at alpha diversity I decided to look at beta diversity, which is a ratio or comparison between two different samples. This allows one to see how two groups compare to one another. By doing this I can see how the control group compares to the PD group. 
 
 ```{r I, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 DCA <- fung %>% 
@@ -136,11 +136,11 @@ plot_ordination(fung %>% transform_sample_counts(function(x){x/sum(x)}),
 theme_minimal()
 ```
 
-text place holder (not finished)
+Based on what I have seen so far I was not expecting the beta diversity to be any different then what I had seen so far. The data above shows that the control and PD have vary similar values on the graph, which is why they are grouped together most of the time. There are a few areas that have outliers with just control or PD, but for the most part they seemed to be near to each other. This shows that the diversity between samples is not much better then the diversity of the samples themselves. 
 
 ### Categorical Comparison of BMI, sex, and disease status
 
-text place holder (not finished)
+Continuing with the idea of beta beta diversity I decided to compare several of the variables that the study was looking at. The one I choose where BMI, sex, and how those related to disease status. 
 
 ```{r J, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 plotord2 <- function(i){
@@ -151,14 +151,14 @@ plotord2 <- function(i){
   return(p)
   
 }
-
-```{r K, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 p1 <- plotord2("BMI")
 p2 <- plotord2("sex")
 p3 <- plotord2("disease_status")
 
 p1 + p2 + p3
 ```
+
+I had hopped that by looking at the specific areas of their data I might be able to learn more about how the groups compared. From what I can see from the three graphs above data from BMI, sex, and disease all look very similar. This to me is the reflection of the lack of diversity stemming from a sample size with few OTUs. 
 
 ```{r L, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 fung@sam_data$disease_status[fung@sam_data$disease_status == "PD"] <- 1
@@ -168,7 +168,9 @@ fung@sam_data$disease_status <- as.numeric(fung@sam_data$disease_statu)
 
 ### Shannon Diversity
 
-text place holder (not finished)
+Finally, I decided to look at Shannon diversity index, which looks the number of species in a sample, which is known as richness, and the relative abundance, which is known as evenness. This diversity index is a quantitative indicator that can be used to see how rich in numbers a species is. Shannon diversity is measure of alpha diversity. 
+
+In order to look at the Shannon Diversity properly I decided to look at in both a plot and in a table form with numerical values representing the data.  
 
 ```{r M, echo=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 test <- estimate_richness(fung, measures = "Shannon")
@@ -177,10 +179,8 @@ fung@sam_data$Shannon <- test$Shannon
 
 mod <- glm(data=fung@sam_data %>% as("data.frame"),
            formula = disease_status ~ Shannon,
-           family =  "binomial") 
+           family =  "binomial")
 ```
-
-text place holder (not finished)
 
 ```{r N, echo=FALSE, message=FALSE, warning=FALSE, include=TRUE}
 add_predictions(data=fung@sam_data %>% as("data.frame"),
@@ -191,8 +191,10 @@ add_predictions(data=fung@sam_data %>% as("data.frame"),
 summary(mod)
 ```
   
-text place holder (not finished)
+Of all of the data I have looked at the Shannon diversity was the most surprising. Based on what I can see the Shannon Diversity looks pretty good. The linear tread of the data is good and does indicate some diversity, but not as much as an exponential model would have. 
   
-# Conclusions 
-  
-text place holder (not finished)
+## Conclusions 
+
+After a thorough look at the metadata from this paper I feel that I still have some things I would like to learn, but I do feel that I have learned a lot already. At the start of this research project I wanted to take a more in depth look at the metadata and find if the conclusions that the research paper had found were correct. 
+
+Based on what I have found I cannot come to the same conclusions that the research paper concluded. I cannot see a connection between the Parkinson's disease and the gut mycobiome. I can see a weak connection in the Shannon Diversity Index, but I feel that is not enough due to the lower number of samples. It is the few numbers of samples and OTUs that hamper the data and any conclusions that can be drawn. 
